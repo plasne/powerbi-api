@@ -1,0 +1,58 @@
+{
+    "name": "Contacts",
+    "columns": [
+        {
+            "dataType": "string",
+            "name": "FirstName",
+            "options": [
+                "Peter",
+                "John",
+                "Fred",
+                "Brian",
+                "Hugo",
+                "Harold",
+                "Patrick",
+                "Allen",
+                "Andy",
+                "Daniel",
+                "Eugene",
+                "Gil",
+                "Jason",
+                "Oliva",
+                "Shawn"
+            ]
+        },
+        {
+            "dataType": "string",
+            "name": "LastName",
+            "options": [
+                "Smith",
+                "Johnson",
+                "Williams",
+                "Jones",
+                "Brown",
+                "Davis",
+                "Miller",
+                "Wilson",
+                "Moore",
+                "Taylor",
+                "Anderson",
+                "Thomas",
+                "Jackson"
+            ]
+        },
+        {
+            "dataType": "string",
+            "name": "CompanyName",
+            "options": [
+                "Walmart",
+                "State Grid",
+                "Sinopec Group",
+                "Chevron",
+                "Toyota",
+                "Volkswagen Group",
+                "Royal Dutch Shell"
+            ]
+        }
+    ]
+}

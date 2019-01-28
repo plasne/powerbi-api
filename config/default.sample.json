@@ -1,9 +1,0 @@
-{
-    "authority": "https://login.microsoftonline.com/",
-    "directory": "peterlasne.onmicrosoft.com",
-    "subscription": "########-####-####-####-############",
-    "redirectUri": "http://powerbiapp.peterlasne.com",
-    "clientId": "########-####-####-####-############",
-    "username": "powerbi@peterlasne.onmicrosoft.com",
-    "password": "?????????"
-}

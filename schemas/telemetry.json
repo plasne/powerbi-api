@@ -1,0 +1,43 @@
+{
+    "name": "Contacts",
+    "columns": [
+        {
+            "dataType": "string",
+            "name": "SensorName",
+            "options": [
+                "motor-ABC",
+                "motor-DEF",
+                "motor-GHI",
+                "belt-ABC",
+                "belt-DEF",
+                "belt-GHI",
+                "gateway-ABC",
+                "gateway-DEF",
+                "gateway-GHI"
+            ]
+        },
+        {
+            "dataType": "string",
+            "name": "Location",
+            "options": ["office", "warehouse", "container", "truck"]
+        },
+        {
+            "dataType": "double",
+            "name": "Temperature",
+            "min": 70,
+            "max": 110
+        },
+        {
+            "dataType": "double",
+            "name": "Humidity",
+            "min": 30,
+            "max": 95
+        },
+        {
+            "dataType": "double",
+            "name": "Brightness",
+            "min": 500,
+            "max": 2000
+        }
+    ]
+}
