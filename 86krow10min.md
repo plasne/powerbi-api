@@ -86,6 +86,29 @@ The time between 2 and 4 is only a few seconds, taken as a refresh every 10 minu
 
 You could add a 2nd real-time dataset, this time a Streaming dataset. Then use a Gauge Tile next to your chart visual that resets to 0 and then builds to 100 (percent) using the API as the data is refreshed. With proper context and labeling, this should let your users know that the chart is being refreshed.
 
+You can do that with this application, by creating a Streaming dataset with the following schema:
+
+```json
+{
+    "percentage": "number",
+    "min": "number",
+    "max": "number",
+    "target": "number"
+}
+```
+
+Add a Gauge Tile to your Dashboard using the dataset.
+
+Then add the URL to the .env file:
+
+```bash
+GAUGE_URL=https://api.powerbi.com/beta/111111111-2222-3333-4444-555555555555/datasets/111111111-2222-3333-4444-555555555555/rows?key=ar...%3D%3D
+```
+
+When "interval" is run it will now update the gauge. However, you will notice that the gauge will fill once the last batch of data is pushed, but it may take a couple of seconds before the chart updates, therefore you might wish to delay updating the gauge by a second or two.
+
+![gauge](/images/gauge.png)
+
 ## Alternative: AJAX Web Content
 
 As an alternative, you could use the "Web content" Tile on your Dashboard that makes AJAX calls to a service and displays data in the intended fashion.

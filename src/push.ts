@@ -371,16 +371,53 @@ function addPost(id: string, rows: any[]) {
                     }
                     global.logger.error(JSON.stringify(response));
                     reject();
-                    return;
                 }
             }
         );
     });
 }
 
-function add(id: string, count: number) {
+function updateGauge(url: string, percentage: number) {
+    return new Promise((resolve, reject) => {
+        request.post(
+            {
+                body: {
+                    max: 100,
+                    min: 0,
+                    percentage,
+                    target: 100
+                },
+                json: true,
+                uri: url
+            },
+            (error, response) => {
+                if (!error && response.statusCode === 200) {
+                    global.logger.verbose(`gauge set to "${percentage}".`);
+                    resolve();
+                } else {
+                    if (error) {
+                        global.logger.error(error.stack);
+                    } else {
+                        global.logger.error(
+                            `${response.statusCode}: ${response.statusMessage}`
+                        );
+                    }
+                    global.logger.error(JSON.stringify(response));
+                    reject();
+                }
+            }
+        );
+    });
+}
+
+function add(id: string, count: number, gaugeUrl?: string) {
     return new Promise(async (resolve, reject) => {
         let total = 0;
+
+        // set the gauge to 0%
+        if (gaugeUrl) updateGauge(gaugeUrl, 0);
+
+        // update in batches
         while (total < count) {
             try {
                 // process a batch
@@ -423,11 +460,20 @@ function add(id: string, count: number) {
 
                 // post
                 await addPost(id, rows);
+
+                // set the gauge to x%
+                if (gaugeUrl) {
+                    updateGauge(gaugeUrl, Math.ceil((total / count) * 100));
+                }
             } catch (error) {
                 reject(error);
                 return;
             }
         }
+
+        // set the gauge to 100%
+        if (gaugeUrl) updateGauge(gaugeUrl, 100);
+
         resolve();
     });
 }
@@ -451,9 +497,12 @@ cmd.command('add <dataset_id>')
             // resolve the id
             id = await resolveId(id);
 
+            // options
+            const COUNT = options.count || 1;
+            global.logger.info(`COUNT is "${COUNT}".`);
+
             // push
-            const count = options.count || 1;
-            add(id, count);
+            add(id, COUNT);
         } catch (error) {
             global.logger.error(error.stack);
         }
@@ -567,6 +616,10 @@ cmd.command('interval <dataset_id>')
         'Rows will be inserted every "i" seconds. Defaults to "60".',
         parseInt
     )
+    .option(
+        '-g, --gauge-url <s>',
+        'GAUGE_URL. Specify the URL (with key) for updating a gauge during refresh.'
+    )
     .description(
         'Clears rows and pushes a new set of count rows every few seconds.'
     )
@@ -581,21 +634,25 @@ cmd.command('interval <dataset_id>')
             // resolve the id
             id = await resolveId(id);
 
-            // get options
-            const count = options.count || 1;
-            const every = options.every || 60;
+            // options
+            const COUNT = options.count || 1;
+            const EVERY = options.every || 60;
+            const GAUGE_URL = cmd.redirectUrl || process.env.GAUGE_URL;
+            global.logger.info(`COUNT is "${COUNT}".`);
+            global.logger.info(`EVERY is "${EVERY}".`);
+            global.logger.info(`GAUGE_URL is "${GAUGE_URL}".`);
 
             // start processing
-            const process = async () => {
+            const work = async () => {
                 try {
                     await clear(id);
-                    await add(id, count);
+                    await add(id, COUNT, GAUGE_URL);
                 } catch (error) {
                     global.logger.error(error.stack);
                 }
-                setTimeout(process, every * 1000);
+                setTimeout(work, EVERY * 1000);
             };
-            process();
+            work();
         } catch (error) {
             global.logger.error(error.stack);
         }

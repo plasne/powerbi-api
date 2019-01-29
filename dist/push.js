@@ -352,12 +352,40 @@ function addPost(id, rows) {
                 }
                 global.logger.error(JSON.stringify(response));
                 reject();
-                return;
             }
         });
     });
 }
-function add(id, count) {
+function updateGauge(url, percentage) {
+    return new Promise(function (resolve, reject) {
+        request.post({
+            body: {
+                max: 100,
+                min: 0,
+                percentage: percentage,
+                target: 100
+            },
+            json: true,
+            uri: url
+        }, function (error, response) {
+            if (!error && response.statusCode === 200) {
+                global.logger.verbose("gauge set to \"" + percentage + "\".");
+                resolve();
+            }
+            else {
+                if (error) {
+                    global.logger.error(error.stack);
+                }
+                else {
+                    global.logger.error(response.statusCode + ": " + response.statusMessage);
+                }
+                global.logger.error(JSON.stringify(response));
+                reject();
+            }
+        });
+    });
+}
+function add(id, count, gaugeUrl) {
     var _this = this;
     return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
         var total, batch, rows, i, row, _i, _a, column, error_4;
@@ -365,6 +393,9 @@ function add(id, count) {
             switch (_b.label) {
                 case 0:
                     total = 0;
+                    // set the gauge to 0%
+                    if (gaugeUrl)
+                        updateGauge(gaugeUrl, 0);
                     _b.label = 1;
                 case 1:
                     if (!(total < count)) return [3 /*break*/, 6];
@@ -405,6 +436,10 @@ function add(id, count) {
                 case 3:
                     // post
                     _b.sent();
+                    // set the gauge to x%
+                    if (gaugeUrl) {
+                        updateGauge(gaugeUrl, Math.ceil((total / count) * 100));
+                    }
                     return [3 /*break*/, 5];
                 case 4:
                     error_4 = _b.sent();
@@ -412,6 +447,9 @@ function add(id, count) {
                     return [2 /*return*/];
                 case 5: return [3 /*break*/, 1];
                 case 6:
+                    // set the gauge to 100%
+                    if (gaugeUrl)
+                        updateGauge(gaugeUrl, 100);
                     resolve();
                     return [2 /*return*/];
             }
@@ -423,7 +461,7 @@ cmd.command('add <dataset_id>')
     .option('-c, --count <i>', 'Specify the number of rows to add. Defaults to "1".', parseInt)
     .description('Adds rows to the specified dataset.')
     .action(function (id, options) { return __awaiter(_this, void 0, void 0, function () {
-    var count, error_5;
+    var COUNT, error_5;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -440,8 +478,10 @@ cmd.command('add <dataset_id>')
             case 2:
                 // resolve the id
                 id = _a.sent();
-                count = options.count || 1;
-                add(id, count);
+                COUNT = options.count || 1;
+                global.logger.info("COUNT is \"" + COUNT + "\".");
+                // push
+                add(id, COUNT);
                 return [3 /*break*/, 4];
             case 3:
                 error_5 = _a.sent();
@@ -561,9 +601,10 @@ cmd.command('clear <dataset_id>')
 cmd.command('interval <dataset_id>')
     .option('-c, --count <i>', 'Specify the number of rows to add. Defaults to "1".', parseInt)
     .option('-e, --every <i>', 'Rows will be inserted every "i" seconds. Defaults to "60".', parseInt)
+    .option('-g, --gauge-url <s>', 'GAUGE_URL. Specify the URL (with key) for updating a gauge during refresh.')
     .description('Clears rows and pushes a new set of count rows every few seconds.')
     .action(function (id, options) { return __awaiter(_this, void 0, void 0, function () {
-    var count_1, every_1, process_1, error_8;
+    var COUNT_1, EVERY_1, GAUGE_URL_1, work_1, error_8;
     var _this = this;
     return __generator(this, function (_a) {
         switch (_a.label) {
@@ -581,9 +622,13 @@ cmd.command('interval <dataset_id>')
             case 2:
                 // resolve the id
                 id = _a.sent();
-                count_1 = options.count || 1;
-                every_1 = options.every || 60;
-                process_1 = function () { return __awaiter(_this, void 0, void 0, function () {
+                COUNT_1 = options.count || 1;
+                EVERY_1 = options.every || 60;
+                GAUGE_URL_1 = cmd.redirectUrl || process.env.GAUGE_URL;
+                global.logger.info("COUNT is \"" + COUNT_1 + "\".");
+                global.logger.info("EVERY is \"" + EVERY_1 + "\".");
+                global.logger.info("GAUGE_URL is \"" + GAUGE_URL_1 + "\".");
+                work_1 = function () { return __awaiter(_this, void 0, void 0, function () {
                     var error_9;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
@@ -592,7 +637,7 @@ cmd.command('interval <dataset_id>')
                                 return [4 /*yield*/, clear(id)];
                             case 1:
                                 _a.sent();
-                                return [4 /*yield*/, add(id, count_1)];
+                                return [4 /*yield*/, add(id, COUNT_1, GAUGE_URL_1)];
                             case 2:
                                 _a.sent();
                                 return [3 /*break*/, 4];
@@ -601,12 +646,12 @@ cmd.command('interval <dataset_id>')
                                 global.logger.error(error_9.stack);
                                 return [3 /*break*/, 4];
                             case 4:
-                                setTimeout(process_1, every_1 * 1000);
+                                setTimeout(work_1, EVERY_1 * 1000);
                                 return [2 /*return*/];
                         }
                     });
                 }); };
-                process_1();
+                work_1();
                 return [3 /*break*/, 4];
             case 3:
                 error_8 = _a.sent();

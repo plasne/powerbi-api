@@ -34,9 +34,32 @@ The problem is that clearing the table happens basically instantaneous, but Powe
 
 There is no particular fix for this, but I have raised a suggestion that we be able to create a transaction and refresh only on the completed transaction _or_ we could turn off automatic refresh and have an API to trigger the refresh.
 
-## Alternative: Card Tile
+## Alternative: Gauge Tile
 
-You could add a 2nd real-time dataset, this time a Streaming dataset. Then use a Card Tile next to your chart visual that is updated with "refreshing" or "pending refresh" (or similar) using the API. This could provide additional visual cues about what is happening.
+You could add a 2nd real-time dataset, this time a Streaming dataset. Then use a Gauge Tile next to your chart visual that resets to 0 and then builds to 100 (percent) using the API as the data is refreshed. With proper context and labeling, this should let your users know that the chart is being refreshed.
+
+You can do that with this application, by creating a Streaming dataset with the following schema:
+
+```json
+{
+    "percentage": "number",
+    "min": "number",
+    "max": "number",
+    "target": "number"
+}
+```
+
+Add a Gauge Tile to your Dashboard using the dataset.
+
+Then add the URL to the .env file:
+
+```bash
+GAUGE_URL=https://api.powerbi.com/beta/111111111-2222-3333-4444-555555555555/datasets/111111111-2222-3333-4444-555555555555/rows?key=ar...%3D%3D
+```
+
+When "interval" is run it will now update the gauge. However, you will notice that the gauge will fill once the last batch of data is pushed, but it may take a couple of seconds before the chart updates, therefore you might wish to delay updating the gauge by a second or two.
+
+![gauge](/images/gauge.png)
 
 ## Alternative: AJAX Web Content
 
