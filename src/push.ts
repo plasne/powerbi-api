@@ -556,7 +556,7 @@ cmd.command('clear <dataset_id>')
     });
 
 // push data on a timer
-cmd.command('iterate <dataset_id>')
+cmd.command('interval <dataset_id>')
     .option(
         '-c, --count <i>',
         'Specify the number of rows to add. Defaults to "1".',

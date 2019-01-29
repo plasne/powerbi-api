@@ -1,8 +1,14 @@
-# Accessing the Power BI API non-interactive
+# Power BI API Example
+
+There were 2 recent problem statements that I was trying to address:
+
+-   [50 row table refreshing every 5 seconds](50row5sec.md)
+
+-   [86k row chart refreshing every 10 minutes](86krow10min.md)
+
+## Accessing the Power BI API non-interactive
 
 Since there are no application permissions (only delegate permissions) for Power BI, you must authenticate using a user account.
-
-## Create a User Account
 
 ## Installation and Configuration
 
@@ -74,7 +80,7 @@ node dist/push.js add mydataset --count 5
 To clear the current data and push rows every few seconds (ex. 50 rows every 5 seconds), you can:
 
 ```bash
-node dist/push.js iterate mydataset --count 50 --every 5
+node dist/push.js interval mydataset --count 50 --every 5
 ```
 
 To specify the schema to use (ex. create with the telemetry schema):

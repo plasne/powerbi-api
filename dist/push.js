@@ -558,7 +558,7 @@ cmd.command('clear <dataset_id>')
     });
 }); });
 // push data on a timer
-cmd.command('iterate <dataset_id>')
+cmd.command('interval <dataset_id>')
     .option('-c, --count <i>', 'Specify the number of rows to add. Defaults to "1".', parseInt)
     .option('-e, --every <i>', 'Rows will be inserted every "i" seconds. Defaults to "60".', parseInt)
     .description('Clears rows and pushes a new set of count rows every few seconds.')
