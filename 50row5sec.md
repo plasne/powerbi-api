@@ -1,6 +1,6 @@
 # 50 rows updated in a table every 5 seconds
 
-After evaluating the options for real-time streaming [https://docs.microsoft.com/en-us/power-bi/service-real-time-streaming], there is only 1 suitable option, the Push dataset. The Streaming and PubNub options do not allow you to use the table visual. Though, you can turn on "Historical data analysis" in Streaming, this does the same thing as creating a Push dataset.
+After evaluating the options for real-time streaming https://docs.microsoft.com/en-us/power-bi/service-real-time-streaming, there is only 1 suitable option, the Push dataset. The Streaming and PubNub options do not allow you to use the table visual. Though, you can turn on "Historical data analysis" in Streaming, this does the same thing as creating a Push dataset.
 
 ## Usage
 
