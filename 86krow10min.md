@@ -112,3 +112,7 @@ When "interval" is run it will now update the gauge. However, you will notice th
 ## Alternative: AJAX Web Content
 
 As an alternative, you could use the "Web content" Tile on your Dashboard that makes AJAX calls to a service and displays data in the intended fashion.
+
+## Alterative: DirectQuery + Embedded App
+
+Rather than using a Push dataset at all, you could consider using DirectQuery against a supported datasource like Azure SQL DB. Then you could build an Embedded App which has a refresh method: https://docs.microsoft.com/en-us/power-bi/refresh-data. 
